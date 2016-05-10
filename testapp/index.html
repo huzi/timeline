@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Timeline Chart</title>
+
+    <style>
+        svg {
+            width: 100%;
+        }
+        
+        rect.chart-bounds {
+            fill: transparent;
+        }
+        
+        g.axis path {
+            fill: none;
+            stroke: none;
+        }
+        
+        g.tick line {
+            stroke: #2b2b2b;
+        }
+        
+        g.container line {
+            stroke: #2b2b2b;
+        }
+        
+        g.data-item line.group {
+            stroke: #ff0000;
+        }
+        
+        g.data-item line.group1 {
+            stroke: green;
+        }
+        
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 60px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width:1000px;">
+        <div id="axis"> </div>
+        <div id="data1"> </div>
+        <div id="data2"> </div>
+        <div id="data3"> </div>
+        <div id="data4"> </div>
+        <div id="data5"> </div>
+        <div id="data6"> </div>
+        <div id="data7"> </div>
+        <div id="data8"> </div>
+        <div id="data9"> </div>
+        <div id="data10"> </div>
+        <div id="data11"> </div>
+        <div id="data12"> </div>
+        <div id="data13"> </div>
+        <div id="data14"> </div>
+        <div id="data15"> </div>
+        <div id="data16"> </div>
+        <div id="data17"> </div>
+        <div id="data18"> </div>
+        <div id="data19"> </div>
+        <div id="data20"> </div>
+        <div id="data21"> </div>
+        <div id="data22"> </div>
+        <div id="data23"> </div>
+        <div id="data24"> </div>
+        <div id="data25"> </div>
+        <div id="data26"> </div>
+        <div id="data27"> </div>
+        <div id="data28"> </div>
+        <div id="data29"> </div>
+        <div id="data30"> </div>
+        <div id="data31"> </div>
+        <div id="data32"> </div>
+        <div id="data33"> </div>
+        <div id="data34"> </div>
+        <div id="data35"> </div>
+        <div id="data36"> </div>
+        <div id="data37"> </div>
+        <div id="data38"> </div>
+        <div id="data39"> </div>
+        <div id="data40"> </div>
+    </div>
+
+    <script type="text/javascript" src="../lib/d3.min.js"></script>
+    <script src="../lib/lodash.min.js"></script>
+    <script src="../truncationservice.js"></script>
+    <script src="timeline.js"></script>
+    <script src="renderer.js"></script>
+    <script type="text/javascript">
+    </script>
+
+    <script id="code">
+        'use strict';
+        var originalData = [];
+
+        function randomDate(start, end) {
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+        for (var i = 0; i < 10000; i++) {
+            originalData.push({
+                id: i,
+                label: 'Data ' + i,
+                date: new Date(new Date(2016, 0, 1).getTime() + (i * 86400000))
+            });
+            //console.log(new Date(new Date(2016, 0, 1).getTime() + (i * 86400000)))
+        }
+        var events = (function () {
+            var topics = {};
+            var hOP = topics.hasOwnProperty;
+
+            return {
+                subscribe: function (topic, listener) {
+                    // Create the topic's object if not yet created
+                    if (!hOP.call(topics, topic)) topics[topic] = [];
+
+                    // Add the listener to queue
+                    var index = topics[topic].push(listener) - 1;
+
+                    // Provide handle back for removal of topic
+                    return {
+                        remove: function () {
+                            delete topics[topic][index];
+                        }
+                    };
+                },
+                publish: function (topic, info) {
+                    // If the topic doesn't exist, or there's no listeners in queue, just leave
+                    if (!hOP.call(topics, topic)) return;
+
+                    // Cycle through topics queue, fire!
+                    topics[topic].forEach(function (item) {
+                        item(info != undefined ? info : {});
+                    });
+                }
+            };
+        })();
+        var truncation = new TruncationService();
+        var timeline = new Timeline('#axis');
+        for (var i = 1; i <= 40; i++) {
+            var renderer = new Renderer(timeline, '#data' + i, originalData);
+        }
+    </script>
+</body>
+
+</html>

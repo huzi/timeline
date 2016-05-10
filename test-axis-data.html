@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Timeline Chart</title>
+
+    <style>
+        svg {
+            width: 100%;
+        }
+        
+        rect.chart-bounds {
+            fill: transparent;
+        }
+        
+        g.axis path {
+            fill: none;
+            stroke: none;
+        }
+        
+        g.tick line {
+            stroke: #2b2b2b;
+        }
+        
+        g.data-item line {
+            stroke: #2b2b2b;
+        }
+        
+        g.data-item line.group {
+            stroke: #ff0000;
+        }
+        
+        g.data-item line.group1 {
+            stroke: green;
+        }
+        
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 60px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width:1000px;">
+        <div id="axis">
+        </div>
+        <div id="data">
+        </div>
+    </div>
+
+    <script type="text/javascript" src="lib/d3.min.js"></script>
+    <script type="text/javascript" src="lib/d3-tip.min.js"></script>
+    <script src="lib/lodash.min.js"></script>
+    <script src="truncationservice.js"></script>
+    <script type="text/javascript">
+    </script>
+
+    <script id="code">
+        'use strict';
+
+        function randomDate(start, end) {
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+        var truncation = new TruncationService();
+        var formatTime = d3.time.format("%e %B");
+        var originalData = [];
+        for (var i = 0; i < 10000; i++) {
+            originalData.push({
+                id: i,
+                label: 'Data ' + i,
+                date: randomDate(new Date(2016, 1, 1), new Date(2016, 12, 31))
+            });
+        }
+        originalData = _.sortBy(originalData, 'date');
+
+        function getDataForScale(data, scale) {
+            var filtered = [],
+                scaleStart = scale.domain()[0].getTime(),
+                scaleEnd = scale.domain()[1].getTime(),
+                scaleDelta = scaleEnd - scaleStart,
+                dataTime;
+            for (var i = 0; i < data.length; i++) {
+                dataTime = data[i].date.getTime();
+                if (dataTime > scaleStart - scaleDelta && dataTime < scaleEnd + scaleDelta) {
+                    var item = data[i];
+                    item.x = scale(item.date);
+                    item.type = 'single';
+                    var thresholdDate = scale.invert(item.x + 15)
+                    var cnt = i + 1;
+                    var nextItem = data[cnt];
+                    while (nextItem && nextItem.date < thresholdDate) {
+                        item.type = 'group';
+                        cnt++;
+                        nextItem = data[cnt];
+                    }
+                    if (nextItem) {
+                        item.width = scale(nextItem.date) - item.x;
+                    }
+                    item.cnt = cnt - i;
+                    i = cnt - 1;
+                    filtered.push(item);
+                }
+            }
+            console.log(data.length, filtered.length)
+            return filtered;
+        }
+
+        var margin = {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+            },
+            width = 1000,
+            height = 44;
+
+
+        var scale = d3.time.scale().domain([new Date(2016, 1, 1), new Date(2016, 12, 31)]).range([0, width]);
+        var xAxis = d3.svg.axis().scale(scale).orient('bottom').tickSize(-10);
+        var zoom = d3.behavior.zoom().x(scale)
+            .on('zoom', _.throttle(function () {
+                updateDataItems();
+                svg.select(".x.axis").call(xAxis);
+            }, 100))
+            .on('zoomstart', function () {
+                //console.log('zoomstart', arguments);
+            })
+            .on('zoomend', function () {
+                //console.log('zoomend', arguments);
+            });
+        var svg = d3.select('#axis').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom);
+        //.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+        svg.append('defs').append('clipPath').attr('id', 'chart-content').append('rect').attr('x', 0).attr('y', 0).attr('height', 10).attr('width', width - 0);
+
+        svg.append('rect').attr('class', 'chart-bounds').attr('x', 0).attr('y', 0).attr('height', 10).attr('width', width - 0);
+
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + 10 + ')').call(xAxis);
+        svg.select('.axis').call(zoom);
+
+        var dataSvg = d3.select('#data').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom);
+
+        /* var groupSection = dataSvg.selectAll('.group-section').data(data)
+             .enter()
+             .append('g').attr('class', 'data-item')
+             .append('line')
+             .attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 10);*/
+        var div = d3.select("body").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+        function updateDataItems() {
+            var filtered = getDataForScale(originalData, scale);
+            var updateSelection = dataSvg.selectAll('g.data-item').data(filtered);
+            updateSelection.select('text').text(function (d) {
+                return d.label + '(' + d.cnt + ',' + d.date.toString('dd-MMM-yyyy') + ')';
+            });
+
+            var groupSelection = updateSelection.enter().append('g').attr('class', 'data-item');
+
+            groupSelection.append('line')
+                .attr('x1', 0).attr('x2', 0).attr('y1', 0).attr('y2', 10);
+            groupSelection.append('text').text(function (d) {
+                return d.label + '(' + d.cnt + ',' + d.date.toISOString() + ')';
+            }).attr('fill', 'black').attr('y', 10).attr('x', 5);
+            updateSelection.select('line')
+                .classed('group', function (item) {
+                    return item.type === 'group'
+                });
+            updateSelection.on("mouseover", function (d) {
+                    div.transition()
+                        .duration(2000)
+                        .style("opacity", .9);
+                    div.html(formatTime(d.date) + "<br/>" + d.label)
+                        .style("left", (d3.event.pageX) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                })
+                .on("mouseout", function (d) {
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", 0);
+                });
+
+            updateSelection.exit().remove();
+
+            dataSvg.selectAll('g.data-item').attr('transform', function (dataItem) {
+                return 'translate(' + Math.round(dataItem.x) + ')'
+            }).select('text').each(function () {
+                truncation.truncate(this, d3.select(this).data()[0].width);
+            });
+        }
+
+        updateDataItems();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Timeline Chart</title>
+
+    <style>
+        svg {
+            width: 100%;
+        }
+        
+        rect.chart-bounds {
+            fill: transparent;
+        }
+        
+        g.axis path {
+            fill: none;
+            stroke: none;
+        }
+        
+        g.tick line {
+            stroke: #2b2b2b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="test">
+    </div>
+
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.min.js"></script>
+    <script type="text/javascript">
+    </script>
+
+    <script id="code">
+        'use strict';
+        var margin = {
+                top: 40,
+                right: 40,
+                bottom: 40,
+                left: 40
+            },
+            width = 1000,
+            height = 44;
+
+        var scale = d3.time.scale().domain([new Date(2016, 1, 1), new Date(2016, 12, 31)]).range([0, width]);
+        var xAxis = d3.svg.axis().scale(scale).orient('bottom').tickSize(-10);
+        var zoom = d3.behavior.zoom().x(scale)
+            .on('zoom', function (scale, translate) {
+                console.log(scale, translate);
+                console.log('zoom', arguments);
+                svg.select(".x.axis").call(xAxis);
+            })
+            .on('zoomstart', function () {
+                console.log('zoomstart', arguments);
+            })
+            .on('zoomend', function () {
+                console.log('zoomend', arguments);
+            });
+        var svg = d3.select('#test').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom);
+        //.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+        svg.append('defs').append('clipPath').attr('id', 'chart-content').append('rect').attr('x', 0).attr('y', 0).attr('height', height).attr('width', width - 0);
+
+        svg.append('rect').attr('class', 'chart-bounds').attr('x', 0).attr('y', 0).attr('height', height).attr('width', width - 0);
+
+        svg.append('g').attr('class', 'x axis').attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        svg.select('.axis').call(zoom);
+    </script>
+</body>
+
+</html>

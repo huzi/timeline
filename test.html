@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Timeline Chart</title>
+
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.css">
+    <link rel="stylesheet" href="http://rawgithub.com/Caged/d3-tip/master/examples/example-styles.css">
+    <link rel="stylesheet" href="timeline-chart.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <section flex flex-full-center>
+        <ul id="result">
+        </ul>
+    </section>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.7/d3-tip.min.js"></script>
+    <script type="text/javascript" src="timeline-chart.js"></script>
+
+    <script id="code">
+        'use strict';
+
+        var start = new Date().getTime();
+
+        var list = [];
+        for (var i = 0; i < 10000; i++) {
+            list.push({
+                id: 'id' + i,
+                label: 'label ' + i,
+                from: new Date(),
+                to: new Date(),
+                value: i,
+                secondValue: i + 0.5
+            });
+        }
+        var afterGenerate = new Date().getTime();
+
+        list.forEach(function (item) {
+            item.name = item.label + ' ' + item.value + ',' + item.secondValue;
+            item.duration = item.to.getTime() - item.from.getTime();
+            delete item.secondValue;
+        });
+
+        var afterModify = new Date().getTime();
+
+        console.log('lal')
+
+        $('#result').append('<li>' + (afterGenerate - start) + '</li>');
+        $('#result').append('<li>' + (afterModify - afterGenerate) + '</li>');
+    </script>
+</body>
+
+</html>
