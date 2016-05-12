@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Timeline Chart</title>
+
+    <style>
+        svg {
+            width: 100%;
+        }
+        
+        rect.chart-bounds {
+            fill: transparent;
+        }
+        
+        g.axis path {
+            fill: none;
+            stroke: none;
+        }
+        
+        g.tick line {
+            stroke: #2b2b2b;
+        }
+        
+        g.container line {
+            stroke: #2b2b2b;
+        }
+        
+        g.data-item line.group {
+            stroke: #ff0000;
+        }
+        
+        g.data-item line.group1 {
+            stroke: green;
+        }
+        
+        div.tooltip {
+            position: absolute;
+            text-align: center;
+            width: 60px;
+            height: 28px;
+            padding: 2px;
+            font: 12px sans-serif;
+            background: lightsteelblue;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width:1000px;">
+        <h2>Axis</h2>
+        <div id="axis"> </div>
+        <h2>Test 1</h2>
+        <div id="test1"> </div>
+        <h2>Test 2</h2>
+        <div id="test2"> </div>
+        <h2>Test 3</h2>
+        <div id="test3"> </div>
+        <h2>Test 4</h2>
+        <div id="test4"> </div>
+        <h2>Test 5</h2>
+        <div id="test5"> </div>
+        <h2>Test 6</h2>
+        <div id="test6"> </div>
+        <h2>Test 7</h2>
+        <div id="test7"> </div>
+        <h2>Test 8</h2>
+        <div id="test8"> </div>
+        <h2>Test 9</h2>
+        <div id="test9"> </div>
+        <h2>Test 10</h2>
+        <div id="test10"> </div>
+        <h2>Test 11</h2>
+        <div id="test11"> </div>
+        <h2>Test 12</h2>
+        <div id="test12"> </div>
+        <h2>Test 13</h2>
+        <div id="test13"> </div>
+        <h2>Test 14</h2>
+        <div id="test14"> </div>
+        <h2>Test 15</h2>
+        <div id="test15"> </div>
+        <h2>Test 16</h2>
+        <div id="test16"> </div>
+        <h2>Test 17</h2>
+        <div id="test17"> </div>
+        <h2>Test 18</h2>
+        <div id="test18"> </div>
+        <h2>Test 19</h2>
+        <div id="test19"> </div>
+        <h2>Test 20</h2>
+        <div id="test20"> </div>
+        <h2>Test 21</h2>
+        <div id="test21"> </div>
+        <h2>Test 22</h2>
+        <div id="test22"> </div>
+        <h2>Test 23</h2>
+        <div id="test23"> </div>
+        <h2>Test 24</h2>
+        <div id="test24"> </div>
+        <h2>Test 25</h2>
+        <div id="test25"> </div>
+        <h2>Test 26</h2>
+        <div id="test26"> </div>
+        <h2>Test 27</h2>
+        <div id="test27"> </div>
+        <h2>Test 28</h2>
+        <div id="test28"> </div>
+        <h2>Test 29</h2>
+        <div id="test29"> </div>
+        <h2>Test 30</h2>
+        <div id="test30"> </div>
+        <h2>Test 31</h2>
+        <div id="test31"> </div>
+        <h2>Test 32</h2>
+        <div id="test32"> </div>
+        <h2>Test 33</h2>
+        <div id="test33"> </div>
+        <h2>Test 34</h2>
+        <div id="test34"> </div>
+        <h2>Test 35</h2>
+        <div id="test35"> </div>
+        <h2>Test 36</h2>
+        <div id="test36"> </div>
+        <h2>Test 37</h2>
+        <div id="test37"> </div>
+        <h2>Test 38</h2>
+        <div id="test38"> </div>
+        <h2>Test 39</h2>
+        <div id="test39"> </div>
+        <h2>Test 40</h2>
+        <div id="test40"> </div>
+    </div>
+
+    <script type="text/javascript" src="../lib/d3.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.min.js"></script>
+    <script src="../lib/lodash.min.js"></script>
+    <script src="../truncationservice.js"></script>
+    <script src="events.js"></script>
+    <script src="timeline.js"></script>
+    <script src="renderer.js"></script>
+    <script src="barrenderer.js"></script>
+    <script type="text/javascript">
+    </script>
+
+    <script id="code">
+        'use strict';
+        var data = [];
+        for (var i = 0; i < 10; i++) {
+            data.push(new Date(2016, 0, 1, i, 0));
+        }
+
+        function testDates(elm, d) {
+            d.forEach(function (item) {
+                elm.append(scale(item) + ',');
+            });
+        }
+
+
+        var test1 = $('#test1');
+        var minDt = new Date(2016, 0, 1, 0, 0);
+        var maxDt = new Date(2016, 0, 1, 10, 0);
+        /* test1.width(120);
+         test1.height(10);*/
+        var scale = d3.time.scale().domain([minDt, maxDt]).range([0, 100]);
+        testDates(test1, data);
+
+        var zoom = d3.behavior.zoom().x(scale);
+        zoom.scale(2);
+        testDates($('#test2'), data);
+
+        zoom.scale(0.5);
+        testDates($('#test3'), data);
+
+        scale.domain([new Date(2016, 0, 1, 0, 0), new Date(2016, 0, 1, 1, 0)]);
+        testDates($('#test4'), data);
+        $('#test4').append(',' + zoom.scale());
+
+
+        zoom.scale(2);
+        testDates($('#test5'), data);
+
+
+        var timeline = new Timeline('#axis');
+        var mapped = [];
+        data.forEach(function (item) {
+            mapped.push({
+                id: item.getTime(),
+                label: 'Data ' + item.getTime(),
+                date: item
+            });
+        });
+        console.log(mapped);
+        var renderer = new BarRenderer(timeline, '#test6', mapped);
+    </script>
+</body>
+
+</html>

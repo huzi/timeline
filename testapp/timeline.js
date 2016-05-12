@@ -1,5 +1,5 @@
 'use strict';
-var Timeline = function (elmId) {
+var Timeline = function (elmId, options) {
     var that = this;
     var margin = {
             top: 0,
@@ -10,11 +10,20 @@ var Timeline = function (elmId) {
         width = 1000,
         height = 44;
 
+    that.options = {
+        startDate: new Date(2016, 0, 1),
+        endDate: new Date(2016, 11, 31)
+    }
+
+    _.assign(that.options, options);
+
     that.element = d3.select(elmId);
-    that.scale = d3.time.scale().domain([new Date(2016, 0, 1), new Date(2016, 0, 31)]).range([0, width]);
+    that.scale = d3.time.scale().domain([that.options.startDate, that.options.endDate]).range([0, width]);
     that.xAxis = d3.svg.axis().scale(that.scale).orient('bottom').tickSize(-10);
     that.zoom = d3.behavior.zoom().x(that.scale).scaleExtent([0, 2])
-        .on('zoom', _.throttle(function () {
+        .on('zoom', _.throttle(function (a, b, c) {
+            console.log('zoom', arguments, that.zoom.scale());
+            console.log(a, b, c, d3.event);
             var start = new Date().getTime();
             that.redraw();
             console.log('redraw', new Date().getTime() - start);
@@ -23,6 +32,7 @@ var Timeline = function (elmId) {
             //console.log('zoomstart', arguments);
         })
         .on('zoomend', function () {
+            console.log('zoomend', arguments, that.zoom.scale());
             events.publish('zoomend');
         });
     that.svg = that.element.append('svg')
@@ -43,4 +53,9 @@ Timeline.prototype.redraw = function () {
     var that = this;
     events.publish('redraw');
     that.svg.select('.x.axis').call(that.xAxis);
+}
+
+Timeline.prototype.xForDate = function (date) {
+    var that = this;
+    return Math.round(that.scale(date));
 }

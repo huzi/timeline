@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Simple Tests - Using Mocha & Chai</title>
+    <link rel="stylesheet" href="/usr/local/lib/node_modules/mocha/mocha.css" />
+    <style>
+        svg {
+            border: 1px solid #ccc;
+        }
+        
+        g.container line {
+            stroke: #2b2b2b;
+        }
+        
+        g.data-item line.group {
+            stroke: #ff0000;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Tests</h1>
+
+    <div id="test"></div>
+    <div id="mocha"></div>
+    <!-- 1 -->
+    <script src="/usr/local/lib/node_modules/mocha/mocha.js"></script>
+    <script src="/usr/local/lib/node_modules/chai/chai.js"></script>
+    <script src="../../lib/jquery.min.js"></script>
+    <script src="../../lib/d3.min.js"></script>
+    <script src="../../lib/lodash.min.js"></script>
+    <script src="../events.js"></script>
+    <script src="../timeline.js"></script>
+    <script src="../barrenderer.js"></script>
+    <script>
+        mocha.ui('bdd'); // 2
+        mocha.reporter('html'); // 3
+        var expect = chai.expect; // 4
+    </script>
+    <script src="test.js"></script>
+    <!-- 5 -->
+    <script>
+        mocha.run(); // 6
+    </script>
+</body>
+
+</html>
