@@ -37,5 +37,4 @@ BaseRenderer.prototype._filterData = function () {
         }
     }
     that._filtered = filtered;
-    console.log(filtered.length);
 }

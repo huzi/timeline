@@ -20,14 +20,12 @@ var Timeline = function (elmId, options) {
     that.element = d3.select(elmId);
     that.scale = d3.time.scale().domain([that.options.startDate, that.options.endDate]).range([0, width]);
     that.xAxis = d3.svg.axis().scale(that.scale).orient('bottom').tickSize(-10);
-    that.zoom = d3.behavior.zoom().x(that.scale).scaleExtent([0, 2])
-        .on('zoom', _.throttle(function (a, b, c) {
-            console.log('zoom', arguments, that.zoom.scale());
-            console.log(a, b, c, d3.event);
+    that.zoom = d3.behavior.zoom().scaleExtent([0.1, 10])
+        .on('zoom', function (a, b, c) {
             var start = new Date().getTime();
             that.redraw();
-            console.log('redraw', new Date().getTime() - start);
-        }, 50))
+            console.log('zoom', new Date().getTime() - start);
+        })
         .on('zoomstart', function () {
             //console.log('zoomstart', arguments);
         })
@@ -35,6 +33,7 @@ var Timeline = function (elmId, options) {
             console.log('zoomend', arguments, that.zoom.scale());
             events.publish('zoomend');
         });
+
     that.svg = that.element.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)

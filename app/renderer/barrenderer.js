@@ -4,9 +4,9 @@ var BarRenderer = function (timeline, selector, data) {
 
     var width = 1000,
         height = 33;
-    
+
     _.assign(that, BaseRenderer.prototype);
-    
+
     that.timeline = timeline;
     that.originalData = _.sortBy(data, 'date');
     that._filterData();
@@ -15,8 +15,9 @@ var BarRenderer = function (timeline, selector, data) {
         .attr('width', width)
         .attr('height', height)
         .attr("transform", "translate(" + 0 + "," + 0 + ")")
-        //.call(that.timeline.zoom);
+        .call(that.timeline.zoom);
     that.dataSvgGraphic = that.dataSvg.append('g').attr('class', 'container');
+
     that.draw();
     that.redraw();
 
@@ -56,10 +57,6 @@ BarRenderer.prototype.draw = function () {
         }).classed('group', function (item) {
             return item.type === 'group'
         });
-    updateSelection.select('text')
-        .attr('x', function (data) {
-            return that.timeline.xForDate(data.date) - offset + 4;
-        }).text('group');
 
     updateSelection.exit().remove();
 
@@ -75,11 +72,6 @@ BarRenderer.prototype.draw = function () {
                 }).attr('y1', 0).attr('y2', 10).classed('group', function (item) {
                     return item.type === 'group'
                 });
-            g.append('text')
-                .attr('x', function (data) {
-                    return that.timeline.xForDate(data.date) - offset + 4;
-                }).attr('y', 10).text('group');
-
         });
 
     //console.log('renderer draw', new Date().getTime() - start);

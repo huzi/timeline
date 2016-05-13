@@ -100,6 +100,7 @@
     <script src="../truncationservice.js"></script>
     <script src="events.js"></script>
     <script src="timeline.js"></script>
+    <script src="renderer/baserenderer.js"></script>
     <script src="renderer/renderer.js"></script>
     <script src="renderer/barrenderer.js"></script>
     <script type="text/javascript">
@@ -124,7 +125,12 @@
         var truncation = new TruncationService();
         var timeline = new Timeline('#axis');
         for (var i = 1; i <= 40; i++) {
-            var renderer = new BarRenderer(timeline, '#data' + i, originalData);
+            if(i%2 === 0){
+            new BarRenderer(timeline, '#data' + i, originalData);
+            }else{
+                
+            new TextRenderer(timeline, '#data' + i, originalData);
+            }
         }
     </script>
 </body>
